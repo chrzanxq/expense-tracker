@@ -1,6 +1,6 @@
+namespace App\Controller\Api;
 
 <?php
-namespace App\Controller\Api;
 
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -11,6 +11,8 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
+    // ...
+
     /**
      * @Route("/api/register", name="api_register", methods={"POST"})
      */
@@ -18,10 +20,11 @@ class UserController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        // Validate the data received from the front-end (email, password, etc.)
+        // Validate the data received from the front-end (name, email, password, etc.)
 
-        // Create a new User entity and set the email
+        // Create a new User entity and set the properties
         $user = new User();
+        $user->setName($data['name']);
         $user->setEmail($data['email']);
 
         // Encode the password before storing it in the database
@@ -35,4 +38,6 @@ class UserController extends AbstractController
 
         return new JsonResponse(['message' => 'User registered successfully!']);
     }
+
+    // ...
 }
