@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { Dark } from 'quasar'
+import { Dark, Notify } from 'quasar'
 import axios from 'axios'
 export default {
   data() {
@@ -68,10 +68,21 @@ export default {
         email: this.email,
         password: this.password
       };
-      console.log('aa')
+
       try {
         const response = await axios.post('http://127.0.0.1:8000/api/register', userData);
-        console.log(response.data.message); // Registration successful
+        console.log(response)
+
+        if(response.status === 201){
+          Notify.create({
+            message: 'Account Created! You can now Log In',
+            type:'positive'
+          })
+
+          this.registerNew = false
+         
+        }
+        
       } catch (error) {
         console.error(error);
       }
