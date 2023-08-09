@@ -89,7 +89,22 @@ export default {
     },
 
     async login() {
-      console.log
+      const userData = {
+        email: this.email,
+        password: this.password
+      };
+      
+      try{
+        const response = await axios.post('http://127.0.0.1:8000/api/login', userData);
+        Notify.create({
+          type:'positive',
+          message:'Success!'
+        })
+        this.$router.push('/default')
+      } catch(error) {
+        console.log(error)
+      }
+
     }
   }
 };

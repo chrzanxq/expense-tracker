@@ -7,6 +7,11 @@ const routes = [
       { path: '', component: () => import('pages/AuthView.vue') }
     ]
   },
+  {
+    path: '/default',
+    component: () => import('layouts/MainLayout.vue'),
+    children: []
+  },
 
   // Always leave this as last one,
   // but you can also remove it
