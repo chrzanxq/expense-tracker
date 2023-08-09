@@ -1,15 +1,6 @@
 <template>
   <q-form @submit="submitForm">
     <q-input
-      v-if="registerNew"
-      class="q-pa-md"
-      filled
-      v-model="name"
-      label="Your name"
-      lazy-rules
-      :rules="[val => val && val.length > 0 || 'Please type something']"
-    />
-    <q-input
       v-model="email"
       class="q-pa-md"
       filled
@@ -46,10 +37,10 @@
 
 <script>
 import { Dark } from 'quasar'
+import axios from 'axios'
 export default {
   data() {
     return {
-      name: '',
       email: '',
       password: '',
       registerNew: false,
@@ -57,9 +48,6 @@ export default {
   },
   computed: {
     disabled(){
-      if(this.registerNew){
-        return !this.name || !this.email || !this.password
-      }
       return !this.email || !this.password
     },
     anchorStyle(){
@@ -69,32 +57,28 @@ export default {
   },  
   methods: {
     submitForm() {
-      if (this.name) {
+      if (this.registerNew) {
         this.register();
       } else {
         this.login();
       }
     },
     async register() {
+      const userData = {
+        email: this.email,
+        password: this.password
+      };
       console.log('aa')
-      // Send a POST request to your Symfony API endpoint for registration
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name: this.name,
-          email: this.email,
-          password: this.password
-        })
-      });
-
-      console.log(response)
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/register', userData);
+        console.log(response.data.message); // Registration successful
+      } catch (error) {
+        console.error(error);
+      }
     },
 
     async login() {
-      // Send login request to the server
+      console.log
     }
   }
 };

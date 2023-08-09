@@ -2,40 +2,39 @@
 
 namespace App\Controller;
 
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Entity\User;
+use App\Http\Controllers\Controller;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 class RegistrationController extends AbstractController
 {
-    #[Route('/register', name: 'register')]
-    public function registerForm(): Response
-    {
-        // Render the registration form template
-        return $this->render('registration/register.html.twig');
-    }
 
-    #[Route('/register', name: 'register_process', methods: ['POST'])]
-    public function registerProcess(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
+    #[Route('/api/register', name: 'api_register', methods: ['POST'])]
+    public function apiRegister(Request $request, ManagerRegistry $doctrine, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
-        // Process the submitted registration form data and create a new user
-        $email = $request->request->get('email');
-        $password = $request->request->get('password');
+        $data = json_decode($request->getContent(), true);
+        $email = $data['email'];
+        $password = $data['password'];
 
-        // Create a new User entity and set the email
+        $entityManager = $doctrine->getManager();
+
         $user = new User();
-        $user->setEmail($email);
+        $user->setUsername($email); // Assuming email is used as username
+        $hashedPassword = $passwordHasher->hashPassword($user, $password);
+        $user->setPassword($hashedPassword);
+        $user->setRoles(['ROLE_USER']); // Default role
 
-        // Encode the password before storing it in the database
-        $encodedPassword = $passwordEncoder->encodePassword($user, $password);
-        $user->setPassword($encodedPassword);
-
-        // Save the user data to the database
-        $entityManager = $this->getDoctrine()->getManager();
         $entityManager->persist($user);
         $entityManager->flush();
 
-        // Redirect the user to a login page or dashboard after successful registration
-        return $this->redirectToRoute('login');
+        return new JsonResponse(['message' => 'Registration successful'], Response::HTTP_CREATED);
     }
+
 }
